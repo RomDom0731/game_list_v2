@@ -1,4 +1,9 @@
+const fs = require('fs');
+const path = require('path');
+
 let games = null;
+
+const DATA_FILE = path.join('/tmp', 'games.json');
 
 // Initial 31 records for requirement
 const INITIAL_DATA = [
@@ -35,43 +40,56 @@ const INITIAL_DATA = [
     { id: 31, title: "Rhythm Heaven", genre: "Music", rating: 8 }
 ];
 
-exports.handler = async (event) => {
-  if (!games) {
-    games = [...INITIAL_DATA];
+function readData() {
+  if (!fs.existsSync(DATA_FILE)) {
+      fs.writeFileSync(DATA_FILE, JSON.stringify(INITIAL_DATA));
+      return INITIAL_DATA;
   }
+  return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+}
+
+// Helper to save data
+function saveData(data) {
+  fs.writeFileSync(DATA_FILE, JSON.stringify(data));
+}
+
+exports.handler = async (event) => {
+  let games = readData();
   const method = event.httpMethod;
   const params = event.queryStringParameters;
   const body = event.body ? JSON.parse(event.body) : null;
 
   if (method === "GET") {
-    const page = parseInt(params.page) || 1;
-    const pageSize = 10;
-    const start = (page - 1) * pageSize;
-    return {
-      statusCode: 200,
-      body: JSON.stringify({
-        data: games.slice(start, start + pageSize),
-        allGames: games,
-        page: page,
-        totalPages: Math.ceil(games.length / pageSize)
-      })
-    };
+      const page = parseInt(params.page) || 1;
+      const pageSize = 10;
+      const start = (page - 1) * pageSize;
+      return {
+          statusCode: 200,
+          body: JSON.stringify({
+              data: games.slice(start, start + pageSize),
+              allGames: games,
+              page: page,
+              totalPages: Math.ceil(games.length / pageSize)
+          })
+      };
   }
 
   if (method === "POST") {
-    if (body.id) {
-      const idx = games.findIndex(g => g.id === body.id);
-      if (idx !== -1) games[idx] = body;
-    } else {
-      body.id = Date.now();
-      games.push(body);
-    }
-    return { statusCode: 200, body: JSON.stringify({ success: true }) };
+      if (body.id) {
+          const idx = games.findIndex(g => g.id === body.id);
+          if (idx !== -1) games[idx] = body;
+      } else {
+          body.id = Date.now();
+          games.push(body);
+      }
+      saveData(games); // PERSIST TO JSON FILE
+      return { statusCode: 200, body: JSON.stringify({ success: true }) };
   }
 
   if (method === "DELETE") {
-    games = games.filter(g => g.id != params.id);
-    return { statusCode: 200, body: JSON.stringify({ success: true }) };
+      games = games.filter(g => g.id != params.id);
+      saveData(games); // PERSIST TO JSON FILE
+      return { statusCode: 200, body: JSON.stringify({ success: true }) };
   }
 
   return { statusCode: 405, body: "Method Not Allowed" };

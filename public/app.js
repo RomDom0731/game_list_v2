@@ -11,7 +11,6 @@ const viewButton = document.getElementById("view-button");
 // Initial Load
 async function init() {
     await fetchGames();
-    populateGenreDropdown();
 }
 
 async function fetchGames() {
@@ -24,6 +23,7 @@ async function fetchGames() {
         renderList(result.data); 
         renderStats(games);
         updatePaginationUI(result.page, result.totalPages);
+        populateGenreDropdown()
     } catch (error) {
         console.error("Failed to fetch games:", error);
     }
@@ -55,6 +55,23 @@ function showList() {
     fetchGames();
 }
 
+function populateGenreDropdown() {
+    const genreSelect = document.getElementById("genre");
+    if (!genreSelect) return;
+
+    // Use the full games list to find all unique genres
+    const uniqueGenres = [...new Set(games.map(game => game.genre))].filter(Boolean).sort();
+
+    genreSelect.innerHTML = '<option value="" disabled selected>Select a genre</option>';
+
+    uniqueGenres.forEach(genre => {
+        const option = document.createElement("option");
+        option.value = genre;
+        option.textContent = genre;
+        genreSelect.appendChild(option);
+    });
+}
+
 // Global scope functions for buttons in ui.js
 window.updateGame = (id) => {
     const game = games.find(g => g.id === id);
@@ -82,22 +99,40 @@ cancelButton.onclick = () => modal.classList.add("hidden");
 
 form.onsubmit = async (e) => {
     e.preventDefault();
+    
     const gameData = {
-        title: document.getElementById("title").value,
+        title: document.getElementById("title").value.trim(),
         genre: document.getElementById("genre").value,
         rating: Number(document.getElementById("rating").value)
     };
-    if (window.editedGameID) gameData.id = window.editedGameID;
 
-    await fetch("/.netlify/functions/api", {
-        method: "POST",
-        body: JSON.stringify(gameData)
-    });
+    // Server-side validation check (Requirement 5)
+    if (!gameData.title || !gameData.genre) {
+        alert("Please fill in all fields.");
+        return;
+    }
 
-    window.editedGameID = null;
-    modal.classList.add("hidden");
-    form.reset();
-    await fetchGames();
+    if (window.editedGameID) {
+        gameData.id = window.editedGameID;
+    }
+
+    try {
+        await fetch("/api/api", { // Use the redirect path from netlify.toml
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(gameData)
+        });
+
+        // Reset state
+        window.editedGameID = null;
+        modal.classList.add("hidden");
+        form.reset();
+        
+        // Refresh data
+        await fetchGames(); 
+    } catch (err) {
+        console.error("Save failed:", err);
+    }
 };
 
 init();
