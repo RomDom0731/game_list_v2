@@ -300,3 +300,38 @@ main, #list-view, #stats-view {
     font-weight: 600;
     color: #5f6368;
 }
+
+@media screen and (max-width: 768px) {
+    .main-header h1 {
+        font-size: 1.3rem;
+    }
+
+    /* Stack buttons for easier tapping */
+    .nav-controls {
+        flex-direction: column;
+        padding: 0 20px;
+    }
+
+    #add-game-button, #view-button {
+        width: 100%;
+    }
+
+    /* Enable horizontal scrolling for the table to prevent layout break */
+    .genre-card {
+        width: 95%;
+        overflow-x: auto;
+        padding: 10px;
+    }
+
+    /* Scale down the stats cards */
+    .stats-grid {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .stat-card {
+        width: 100%;
+        max-width: 280px;
+        margin-bottom: 15px;
+    }
+}
