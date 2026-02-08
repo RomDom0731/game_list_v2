@@ -36,30 +36,41 @@ const INITIAL_DATA = [
     { id: 31, title: "Rhythm Heaven", genre: "Music", rating: 8 }
 ];
 
-exports.handler = async (event, context) => {
+exports.handler = async (event) => {
   const method = event.httpMethod;
   const params = event.queryStringParameters;
-  let games = [...INITIAL_DATA]; // In a real app, you'd read from a DB or persistent storage
+  const body = event.body ? JSON.parse(event.body) : null;
 
-  if (method === 'GET') {
+  if (method === "GET") {
     const page = parseInt(params.page) || 1;
-    const pageSize = 10; // Fixed page size
+    const pageSize = 10;
     const start = (page - 1) * pageSize;
-    const paginatedGames = games.slice(start, start + pageSize);
-
     return {
       statusCode: 200,
       body: JSON.stringify({
-        data: paginatedGames,
-        total: games.length,
+        data: games.slice(start, start + pageSize),
+        allGames: games,
         page: page,
         totalPages: Math.ceil(games.length / pageSize)
       })
     };
   }
 
-  // Handle POST (Add/Edit) and DELETE similarly...
+  if (method === "POST") {
+    if (body.id) {
+      const idx = games.findIndex(g => g.id === body.id);
+      if (idx !== -1) games[idx] = body;
+    } else {
+      body.id = Date.now();
+      games.push(body);
+    }
+    return { statusCode: 200, body: JSON.stringify({ success: true }) };
+  }
 
-  if (method === 'ADD')
-  return { statusCode: 405, body: 'Method Not Allowed' };
+  if (method === "DELETE") {
+    games = games.filter(g => g.id != params.id);
+    return { statusCode: 200, body: JSON.stringify({ success: true }) };
+  }
+
+  return { statusCode: 405, body: "Method Not Allowed" };
 };
