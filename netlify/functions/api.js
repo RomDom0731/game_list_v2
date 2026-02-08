@@ -1,5 +1,4 @@
-const fs = require('fs');
-const path = require('path');
+let games = null;
 
 // Initial 31 records for requirement
 const INITIAL_DATA = [
@@ -37,6 +36,9 @@ const INITIAL_DATA = [
 ];
 
 exports.handler = async (event) => {
+  if (!games) {
+    games = [...INITIAL_DATA];
+  }
   const method = event.httpMethod;
   const params = event.queryStringParameters;
   const body = event.body ? JSON.parse(event.body) : null;

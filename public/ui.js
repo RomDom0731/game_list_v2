@@ -7,52 +7,44 @@ function renderList(games) {
         return;
     }
 
+    // Create a single container for the unified table
     const container = document.createElement("div");
-    container.className = "tables-container";
+    container.className = "genre-card"; // Reusing your card styling
+    container.style.maxWidth = "800px";
+    container.style.margin = "20px auto";
     listView.appendChild(container);
 
-    const grouped = games.reduce((acc, game) => {
-        acc[game.genre] = acc[game.genre] || [];
-        acc[game.genre].push(game);
-        return acc;
-    }, {});
-
-    const sortedGenres = Object.keys(grouped).sort();
-
-    sortedGenres.forEach(genre => {
-        const section = document.createElement("div");
-        section.className = "genre-card";
-        section.innerHTML = `<h3>${genre}</h3>`;
-        
-        const tbl = document.createElement("table");
-        const headerRow = tbl.insertRow();
-        ["Title", "Rating", "Actions"].forEach(text => {
-            const th = document.createElement("th");
-            th.textContent = text;
-            headerRow.appendChild(th);
-        });
-
-        grouped[genre].forEach(game => {
-            const row = tbl.insertRow();
-            row.insertCell().textContent = game.title;
-            row.insertCell().textContent = game.rating;
-
-            const actionsCell = row.insertCell();
-
-            const editButton = document.createElement("button");
-            editButton.textContent = "Edit";
-            editButton.onclick = () => updateGame(game.id);
-            actionsCell.appendChild(editButton);
-            
-            const deleteButton = document.createElement("button");
-            deleteButton.textContent = "Delete";
-            deleteButton.onclick = () => deleteGame(game.id);
-            actionsCell.appendChild(deleteButton);
-        });
-
-        section.appendChild(tbl);
-        container.appendChild(section);
+    const tbl = document.createElement("table");
+    const headerRow = tbl.insertRow();
+    
+    // Added "Genre" to the headers
+    ["Title", "Genre", "Rating", "Actions"].forEach(text => {
+        const th = document.createElement("th");
+        th.textContent = text;
+        headerRow.appendChild(th);
     });
+
+    // Render exactly the 10 games provided for this page
+    games.forEach(game => {
+        const row = tbl.insertRow();
+        row.insertCell().textContent = game.title;
+        row.insertCell().textContent = game.genre; // New Genre column
+        row.insertCell().textContent = game.rating;
+
+        const actionsCell = row.insertCell();
+
+        const editButton = document.createElement("button");
+        editButton.textContent = "Edit";
+        editButton.onclick = () => updateGame(game.id);
+        actionsCell.appendChild(editButton);
+        
+        const deleteButton = document.createElement("button");
+        deleteButton.textContent = "Delete";
+        deleteButton.onclick = () => deleteGame(game.id);
+        actionsCell.appendChild(deleteButton);
+    });
+
+    container.appendChild(tbl);
 }
 
 function renderStats(games) {
@@ -66,7 +58,7 @@ function renderStats(games) {
     let mostCommonGenre = "N/A";
     if (totalGames > 0) {
         const counts = games.reduce((acc, game) => {
-            acc[acc.genre] = (acc[game.genre] || 0) + 1;
+            acc[game.genre] = (acc[game.genre] || 0) + 1;
             return acc;
         }, {});
         mostCommonGenre = Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);

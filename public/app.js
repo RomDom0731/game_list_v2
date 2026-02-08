@@ -35,6 +35,26 @@ function updatePaginationUI(current, total) {
     document.getElementById("page-indicator").textContent = `Page ${current} of ${total}`;
 }
 
+function showStats() {
+    currentView = "stats";
+    listView.classList.add("hidden");
+    // Ensure pagination is hidden in stats view
+    document.getElementById("pagination-controls").classList.add("hidden");
+    statsView.classList.remove("hidden");
+    viewButton.textContent = "View Games";
+    renderStats(games); 
+}
+
+function showList() {
+    currentView = "list";
+    statsView.classList.add("hidden");
+    listView.classList.remove("hidden");
+    // Ensure pagination is visible in list view
+    document.getElementById("pagination-controls").classList.remove("hidden");
+    viewButton.textContent = "View Stats";
+    fetchGames();
+}
+
 // Global scope functions for buttons in ui.js
 window.updateGame = (id) => {
     const game = games.find(g => g.id === id);
