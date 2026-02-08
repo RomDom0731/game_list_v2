@@ -7,6 +7,8 @@ const addButton = document.getElementById("add-game-button");
 const cancelButton = document.getElementById("cancel-button");
 const form = document.getElementById("game-form");
 const viewButton = document.getElementById("view-button");
+const listView = document.getElementById("list-view");
+const statsView = document.getElementById("stats-view");
 
 // Initial Load
 async function init() {
@@ -125,7 +127,7 @@ form.onsubmit = async (e) => {
     }
 
     try {
-        await fetch("/api/api", { // Use the redirect path from netlify.toml
+        await fetch("/api", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(gameData)

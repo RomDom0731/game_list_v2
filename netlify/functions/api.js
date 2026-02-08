@@ -1,9 +1,10 @@
 const fs = require('fs');
 const path = require('path');
 
-let games = null;
-
-const DATA_FILE = path.join('/tmp', 'games.json');
+const isProduction = process.env.NODE_ENV === 'production';
+const DATA_FILE = isProduction 
+    ? path.join('/tmp', 'games.json') 
+    : path.join(__dirname, 'games.json');
 
 // Initial 31 records for requirement
 const INITIAL_DATA = [
