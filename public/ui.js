@@ -1,6 +1,11 @@
 function renderList(games) {
     const listView = document.getElementById("list-view");
-    listView.innerHTML = ""; 
+    listView.innerHTML = ""; // Clear previous page content
+
+    if (games.length === 0) {
+        listView.innerHTML = "<p style='text-align:center;'>No games found.</p>";
+        return;
+    }
 
     const container = document.createElement("div");
     container.className = "tables-container";
@@ -12,7 +17,6 @@ function renderList(games) {
         return acc;
     }, {});
 
-    //Sorts games into different genre so they are in different tables
     const sortedGenres = Object.keys(grouped).sort();
 
     sortedGenres.forEach(genre => {
@@ -53,25 +57,21 @@ function renderList(games) {
 
 function renderStats(games) {
     const statsContent = document.getElementById("stats-content");
-
     const totalGames = games.length;
 
-    //Calculates average rating of all games in the list
     const avgRating = totalGames > 0 
         ? (games.reduce((sum, game) => sum + game.rating, 0) / totalGames).toFixed(1) 
         : "0.0";
 
-    //Calculates the most common genre of the ones listed
     let mostCommonGenre = "N/A";
     if (totalGames > 0) {
         const counts = games.reduce((acc, game) => {
-            acc[game.genre] = (acc[game.genre] || 0) + 1;
+            acc[acc.genre] = (acc[game.genre] || 0) + 1;
             return acc;
         }, {});
         mostCommonGenre = Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
     }
 
-    //HTML for stat view
     statsContent.innerHTML = `
         <div class="stats-grid">
             <div class="stat-card blue">

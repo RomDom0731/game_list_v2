@@ -283,3 +283,31 @@ td button:nth-of-type(2):hover {
 main, #list-view, #stats-view {
     min-height: 80vh;
 }
+
+/* style.css */
+#pagination-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+#pagination-controls button {
+    background-color: #1a73e8;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+#pagination-controls button:disabled {
+    background-color: #dadce0;
+    cursor: not-allowed;
+}
+
+#page-indicator {
+    font-weight: 600;
+    color: #5f6368;
+}

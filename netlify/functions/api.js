@@ -59,5 +59,7 @@ exports.handler = async (event, context) => {
   }
 
   // Handle POST (Add/Edit) and DELETE similarly...
+
+  if (method === 'ADD')
   return { statusCode: 405, body: 'Method Not Allowed' };
 };
