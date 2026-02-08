@@ -97,6 +97,16 @@ window.updateGame = (id) => {
 window.deleteGame = async (id) => {
     if (confirm("Are you sure you want to delete this game?")) {
         await fetch(`/.netlify/functions/api?id=${id}`, { method: 'DELETE' });
+        
+        // Check if we need to move back a page
+        // If we are not on the first page and the element we just deleted was the only one on this page
+        const totalGamesAfterDelete = games.length - 1;
+        const maxPagesAfterDelete = Math.ceil(totalGamesAfterDelete / recordsPerPage);
+        
+        if (currentPage > maxPagesAfterDelete && currentPage > 1) {
+            currentPage = maxPagesAfterDelete;
+        }
+
         await fetchGames();
     }
 };
@@ -132,6 +142,11 @@ form.onsubmit = async (e) => {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(gameData)
         });
+
+        if (!window.editedGameID) {
+            const newTotal = games.length + 1;
+            currentPage = Math.ceil(newTotal / recordsPerPage);
+        }
 
         // Reset state
         window.editedGameID = null;
