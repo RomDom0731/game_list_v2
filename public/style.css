@@ -127,10 +127,14 @@ td button:nth-of-type(2):hover {
     height: 100%;
     background: rgba(32, 33, 36, 0.6); 
     backdrop-filter: blur(4px);
-    display: flex; 
+    display: none; 
     align-items: center; 
     justify-content: center;
     z-index: 1000;
+}
+
+#modal-overlay:not(.hidden) {
+    display: flex;
 }
 
 .hidden { 
@@ -306,7 +310,6 @@ main, #list-view, #stats-view {
         font-size: 1.3rem;
     }
 
-    /* Stack buttons for easier tapping */
     .nav-controls {
         flex-direction: column;
         padding: 0 20px;
@@ -316,14 +319,12 @@ main, #list-view, #stats-view {
         width: 100%;
     }
 
-    /* Enable horizontal scrolling for the table to prevent layout break */
     .genre-card {
         width: 95%;
-        overflow-x: auto;
+        overflow-x: auto; /* Allows table scrolling on small screens */
         padding: 10px;
     }
 
-    /* Scale down the stats cards */
     .stats-grid {
         flex-direction: column;
         align-items: center;
@@ -332,6 +333,5 @@ main, #list-view, #stats-view {
     .stat-card {
         width: 100%;
         max-width: 280px;
-        margin-bottom: 15px;
     }
 }

@@ -35,6 +35,14 @@ function updatePaginationUI(current, total) {
     document.getElementById("page-indicator").textContent = `Page ${current} of ${total}`;
 }
 
+viewButton.onclick = () => {
+    if (statsView.classList.contains("hidden")) {
+        showStats();
+    } else {
+        showList();
+    }
+};
+
 function showStats() {
     currentView = "stats";
     listView.classList.add("hidden");
