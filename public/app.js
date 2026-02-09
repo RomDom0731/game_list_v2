@@ -97,10 +97,10 @@ window.updateGame = (id) => {
 
 window.deleteGame = async (id) => {
     if (confirm("Are you sure you want to delete this game?")) {
-        await fetch(`/.netlify/functions/api?id=${id}`, { method: 'DELETE' });
+        // Use the cleaner /api path defined in your netlify.toml redirects
+        await fetch(`/api?id=${id}`, { method: 'DELETE' });
         
-        // Check if we need to move back a page
-        // If we are not on the first page and the element we just deleted was the only one on this page
+        // Automatic page navigation logic
         const totalGamesAfterDelete = games.length - 1;
         const maxPagesAfterDelete = Math.ceil(totalGamesAfterDelete / recordsPerPage);
         

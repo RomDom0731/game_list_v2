@@ -93,9 +93,23 @@ exports.handler = async (event) => {
   }
 
   if (method === "DELETE") {
-      games = games.filter(g => g.id != params.id);
+    if (method === "DELETE") {
+      // Ensure the ID is treated as a number for the comparison
+      const idToDelete = parseInt(params.id);
+      
+      if (isNaN(idToDelete)) {
+          return { statusCode: 400, body: JSON.stringify({ error: "Invalid ID" }) };
+      }
+  
+      games = games.filter(g => g.id !== idToDelete);
       saveData(games); // PERSIST TO JSON FILE
-      return { statusCode: 200, body: JSON.stringify({ success: true }) };
+      
+      return { 
+          statusCode: 200, 
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ success: true }) 
+      };
+  }
   }
 
   return { statusCode: 405, body: "Method Not Allowed" };
