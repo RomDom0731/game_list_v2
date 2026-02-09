@@ -1,15 +1,14 @@
 function renderList(games) {
     const listView = document.getElementById("list-view");
-    listView.innerHTML = ""; // Clear previous page content
+    listView.innerHTML = "";
 
     if (games.length === 0) {
         listView.innerHTML = "<p style='text-align:center;'>No games found.</p>";
         return;
     }
 
-    // Create a single container for the unified table
     const container = document.createElement("div");
-    container.className = "genre-card"; // Reusing your card styling
+    container.className = "genre-card";
     container.style.maxWidth = "800px";
     container.style.margin = "20px auto";
     listView.appendChild(container);
@@ -17,18 +16,17 @@ function renderList(games) {
     const tbl = document.createElement("table");
     const headerRow = tbl.insertRow();
     
-    // Added "Genre" to the headers
+    //Changes format to have Genre as another row in the table
     ["Title", "Genre", "Rating", "Actions"].forEach(text => {
         const th = document.createElement("th");
         th.textContent = text;
         headerRow.appendChild(th);
     });
 
-    // Render exactly the 10 games provided for this page
     games.forEach(game => {
         const row = tbl.insertRow();
         row.insertCell().textContent = game.title;
-        row.insertCell().textContent = game.genre; // New Genre column
+        row.insertCell().textContent = game.genre;
         row.insertCell().textContent = game.rating;
 
         const actionsCell = row.insertCell();
