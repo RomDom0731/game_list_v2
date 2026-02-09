@@ -93,7 +93,6 @@ exports.handler = async (event) => {
   }
 
   if (method === "DELETE") {
-    if (method === "DELETE") {
       // Ensure the ID is treated as a number for the comparison
       const idToDelete = parseInt(params.id);
       
@@ -109,7 +108,6 @@ exports.handler = async (event) => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ success: true }) 
       };
-  }
   }
 
   return { statusCode: 405, body: "Method Not Allowed" };
