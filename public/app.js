@@ -1,4 +1,4 @@
-const API_URL = "https://your-render-app-name.onrender.com/api";
+const API_URL = "https://game-list-v2-1.onrender.com/api";
 let games = [];
 let currentPage = 1;
 const recordsPerPage = 10;

@@ -74,6 +74,9 @@ def save_game():
     body = request.get_json()
     if not body.get('title') or not body.get('genre'):
         return jsonify({"error": "Missing fields"}), 400
+    rating = body.get('rating')
+    if rating is None or not (0 <= float(rating) <= 10):
+        return jsonify({"error": "Rating must be between 0 and 10"}), 400
     if 'id' in body:
         for i, g in enumerate(games):
             if g['id'] == body['id']:
