@@ -1,8 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const isProduction = process.env.NODE_ENV === 'production';
-const DATA_FILE = isProduction 
+const isNetlify = process.env.NETLIFY === 'true'; // Netlify sets this automatically
+const DATA_FILE = isNetlify 
     ? path.join('/tmp', 'games.json') 
     : path.join(__dirname, 'games.json');
 
@@ -42,11 +42,16 @@ const INITIAL_DATA = [
 ];
 
 function readData() {
-  if (!fs.existsSync(DATA_FILE)) {
-      fs.writeFileSync(DATA_FILE, JSON.stringify(INITIAL_DATA));
-      return INITIAL_DATA;
+  try {
+      if (!fs.existsSync(DATA_FILE)) {
+          fs.writeFileSync(DATA_FILE, JSON.stringify(INITIAL_DATA));
+          return INITIAL_DATA;
+      }
+      const data = fs.readFileSync(DATA_FILE, 'utf8');
+      return data ? JSON.parse(data) : INITIAL_DATA;
+  } catch (err) {
+      return INITIAL_DATA; 
   }
-  return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
 }
 
 // Helper to save data

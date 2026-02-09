@@ -19,13 +19,14 @@ async function fetchGames() {
     try {
         const response = await fetch(`/api?page=${currentPage}`);
         const result = await response.json();
-        
-        // Use result.allGames for stats and result.data (the slice of 10) for the list
-        games = result.allGames; 
-        renderList(result.data); 
-        renderStats(games);
-        updatePaginationUI(result.page, result.totalPages);
-        populateGenreDropdown()
+
+        if (result && result.data){
+            games = result.allGames; 
+            renderList(result.data); 
+            renderStats(games);
+            updatePaginationUI(result.page, result.totalPages);
+            populateGenreDropdown()
+        }
     } catch (error) {
         console.error("Failed to fetch games:", error);
     }
