@@ -1,4 +1,5 @@
-let games = []; // All games (for stats)
+const API_URL = "https://your-render-app-name.onrender.com/api";
+let games = [];
 let currentPage = 1;
 const recordsPerPage = 10;
 
@@ -10,25 +11,23 @@ const viewButton = document.getElementById("view-button");
 const listView = document.getElementById("list-view");
 const statsView = document.getElementById("stats-view");
 
-// Initial Load
 async function init() {
     await fetchGames();
 }
 
 async function fetchGames() {
     try {
-        const response = await fetch(`/api?page=${currentPage}`);
+        const response = await fetch(`${API_URL}?page=${currentPage}`);
         const result = await response.json();
-
         if (result && result.data){
             games = result.allGames; 
             renderList(result.data); 
             renderStats(games);
             updatePaginationUI(result.page, result.totalPages);
-            populateGenreDropdown()
+            populateGenreDropdown();
         }
     } catch (error) {
-        console.error("Failed to fetch games:", error);
+        console.error("Fetch error:", error);
     }
 }
 
@@ -47,9 +46,7 @@ viewButton.onclick = () => {
 };
 
 function showStats() {
-    currentView = "stats";
     listView.classList.add("hidden");
-    // Ensure pagination is hidden in stats view
     document.getElementById("pagination-controls").classList.add("hidden");
     statsView.classList.remove("hidden");
     viewButton.textContent = "View Games";
@@ -57,10 +54,8 @@ function showStats() {
 }
 
 function showList() {
-    currentView = "list";
     statsView.classList.add("hidden");
     listView.classList.remove("hidden");
-    // Ensure pagination is visible in list view
     document.getElementById("pagination-controls").classList.remove("hidden");
     viewButton.textContent = "View Stats";
     fetchGames();
@@ -69,12 +64,8 @@ function showList() {
 function populateGenreDropdown() {
     const genreSelect = document.getElementById("genre");
     if (!genreSelect) return;
-
-    // Use the full games list to find all unique genres
     const uniqueGenres = [...new Set(games.map(game => game.genre))].filter(Boolean).sort();
-
     genreSelect.innerHTML = '<option value="" disabled selected>Select a genre</option>';
-
     uniqueGenres.forEach(genre => {
         const option = document.createElement("option");
         option.value = genre;
@@ -83,7 +74,6 @@ function populateGenreDropdown() {
     });
 }
 
-// Global scope functions for buttons in ui.js
 window.updateGame = (id) => {
     const game = games.find(g => g.id === id);
     if (game) {
@@ -96,23 +86,17 @@ window.updateGame = (id) => {
 };
 
 window.deleteGame = async (id) => {
-    if (confirm("Are you sure you want to delete this game?")) {
-        // Use the cleaner /api path defined in your netlify.toml redirects
-        await fetch(`/api?id=${id}`, { method: 'DELETE' });
-        
-        // Automatic page navigation logic
-        const totalGamesAfterDelete = games.length - 1;
-        const maxPagesAfterDelete = Math.ceil(totalGamesAfterDelete / recordsPerPage);
-        
-        if (currentPage > maxPagesAfterDelete && currentPage > 1) {
-            currentPage = maxPagesAfterDelete;
+    if (confirm("Confirm deletion?")) {
+        await fetch(`${API_URL}?id=${id}`, { method: 'DELETE' });
+        const totalAfter = games.length - 1;
+        const maxPages = Math.ceil(totalAfter / recordsPerPage);
+        if (currentPage > maxPages && currentPage > 1) {
+            currentPage = maxPages;
         }
-
         await fetchGames();
     }
 };
 
-// Event Listeners
 document.getElementById("prev-btn").onclick = () => { currentPage--; fetchGames(); };
 document.getElementById("next-btn").onclick = () => { currentPage++; fetchGames(); };
 addButton.onclick = () => modal.classList.remove("hidden");
@@ -120,45 +104,25 @@ cancelButton.onclick = () => modal.classList.add("hidden");
 
 form.onsubmit = async (e) => {
     e.preventDefault();
-    
     const gameData = {
         title: document.getElementById("title").value.trim(),
         genre: document.getElementById("genre").value,
         rating: Number(document.getElementById("rating").value)
     };
-
-    // Server-side validation check (Requirement 5)
-    if (!gameData.title || !gameData.genre) {
-        alert("Please fill in all fields.");
-        return;
+    if (window.editedGameID) gameData.id = window.editedGameID;
+    await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(gameData)
+    });
+    if (!window.editedGameID) {
+        const newTotal = games.length + 1;
+        currentPage = Math.ceil(newTotal / recordsPerPage);
     }
-
-    if (window.editedGameID) {
-        gameData.id = window.editedGameID;
-    }
-
-    try {
-        await fetch("/api", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(gameData)
-        });
-
-        if (!window.editedGameID) {
-            const newTotal = games.length + 1;
-            currentPage = Math.ceil(newTotal / recordsPerPage);
-        }
-
-        // Reset state
-        window.editedGameID = null;
-        modal.classList.add("hidden");
-        form.reset();
-        
-        // Refresh data
-        await fetchGames(); 
-    } catch (err) {
-        console.error("Save failed:", err);
-    }
+    window.editedGameID = null;
+    modal.classList.add("hidden");
+    form.reset();
+    await fetchGames(); 
 };
 
 init();
