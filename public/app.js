@@ -17,7 +17,7 @@ async function init() {
 
 async function fetchGames() {
     try {
-        const response = await fetch(`/.netlify/functions/api?page=${currentPage}`);
+        const response = await fetch(`/api?page=${currentPage}`);
         const result = await response.json();
         
         // Use result.allGames for stats and result.data (the slice of 10) for the list
