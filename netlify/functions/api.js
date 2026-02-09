@@ -1,7 +1,11 @@
 const fs = require('fs');
 const path = require('path');
 
-const isNetlify = process.env.NETLIFY === 'true'; // Netlify sets this automatically
+// FORCE /tmp if ANY Netlify-specific variables are present
+const isNetlify = process.env.NETLIFY === 'true' || 
+                  process.env.LAMBDA_TASK_ROOT || 
+                  process.env.CONTEXT === 'production';
+
 const DATA_FILE = isNetlify 
     ? path.join('/tmp', 'games.json') 
     : path.join(__dirname, 'games.json');
